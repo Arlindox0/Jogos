@@ -1,0 +1,88 @@
+"""Tic Tac Toe
+
+Exercises
+
+1. Give the X and O a different color and width.
+2. What happens when someone taps a taken spot?
+3. How would you detect when someone has won?
+4. How could you create a computer player?
+"""
+
+from turtle import *
+from freegames import line
+
+#  matriz para rastrear os quadrados ocupados
+# funçao que verifica se o espaço esta ocupado
+occupied = [[False, False, False], [False, False, False], [False, False, False]]
+
+def grid():
+    """Desenhe o tabuleiro do jogo da velha."""
+    line(-67, 200, -67, -200)
+    line(67, 200, 67, -200)
+    line(-200, -67, 200, -67)
+    line(-200, 67, 200, 67)
+
+def drawx(x, y):
+    """Desenhe o jogador X."""
+    color("blue") # definindo a cor do X para azul
+    width(2) # Mudando a largura da linha do X
+    line(x, y, x + 120, y + 120)
+    line(x, y + 120, x + 120, y)
+
+def drawo(x, y):
+    """Desenhe o jogador O."""
+    color("red") # definindo a cor do 0 para vermelho
+    width(3) # Mudando a largura da linha do O
+    up()
+    goto(x + 67, y + 5)
+    down()
+    circle(50)
+
+def floor(value):
+    """Arredonde o valor para baixo para a grade com tamanho de quadrado 133."""
+    return ((value + 200) // 133) * 133 - 200
+  #funçao que verifica o vencedor
+def check_win(player):
+    """Verifique se o jogador atual ganhou o jogo."""
+    for i in range(3):
+        # Verificaçao das linhas horizontais e verticais
+        if all(occupied[i][j] == player for j in range(3)) or all(occupied[j][i] == player for j in range(3)):
+            return True
+    # Verificando as diagonais
+    if all(occupied[i][i] == player for i in range(3)) or all(occupied[i][2 - i] == player for i in range(3)):
+        return True
+    return False
+
+state = {'player': 0}
+players = [drawx, drawo]
+
+def tap(x, y):
+    """Desenhe X ou O no quadrado tocado."""
+    x = int(x)
+    y = int(y)
+    player = state['player']
+    # Verificaçao se o quadrado não está ocupado
+    if not occupied[y // 133][x // 133]:
+        draw = players[player]
+        draw(x, y)
+        update()
+        state['player'] = not player
+        # Registre o jogador no quadrado
+        occupied[y // 133][x // 133] = player
+        # mensagem de vitória
+        if check_win(player):
+            print(f"O jogador {player + 1} ganhou!")
+    else:
+        print("Este quadrado já está ocupado. Escolha outro.")
+
+A = input("Escolha qual jogador deseja ser (X ou O): ")
+if A.lower() == "o":
+    players.reverse()
+
+setup(420, 420, 370, 0)
+hideturtle()
+tracer(False)
+grid()
+update()
+onscreenclick(tap)
+done()
